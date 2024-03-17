@@ -1,0 +1,8 @@
+# envoriment
+.env
+
+# docker volume
+mongo_data/
+
+# compiled output
+bin/
