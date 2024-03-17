@@ -14,7 +14,6 @@ type Config struct {
 	MongoDatabaseName            string
 	AccessTokenLifetimeInMinutes int
 	AccessTokenSecret            string
-	RefreshTokenSecret           string
 }
 
 var Envs = initEnvs()
@@ -32,7 +31,6 @@ func initEnvs() *Config {
 		MongoDatabaseName:            getEnvString("MONGO_DATABASE_NAME"),
 		AccessTokenLifetimeInMinutes: getEnvInt("ACCESS_TOKEN_LIFETIME_IN_MINUTES"),
 		AccessTokenSecret:            getEnvString("ACCESS_TOKEN_SECRET"),
-		RefreshTokenSecret:           getEnvString("REFRESH_TOKEN_SECRET"),
 	}
 
 	log.Printf("Config: %+v", config)

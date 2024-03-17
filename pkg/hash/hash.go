@@ -4,11 +4,17 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func HashRefreshTokenString(token string) (string, error) {
-	ht, err := bcrypt.GenerateFromPassword([]byte(token), bcrypt.DefaultCost)
+func HashString(s string) (string, error) {
+	hs, err := bcrypt.GenerateFromPassword([]byte(s), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}
 
-	return string(ht), nil
+	return string(hs), nil
+}
+
+func CompareHashAndString(hs string, s string) error {
+	err := bcrypt.CompareHashAndPassword([]byte(hs), []byte(s))
+
+	return err
 }

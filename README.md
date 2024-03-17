@@ -1,28 +1,35 @@
 # Test task: Auth service API
 
-**Используемые технологии:**
+## Requirements
 
-- Golang
-- JWT
-- MongoDB
+- Golang 1.22.0
+- Docker and Docker Compose
+- Make
 
-**Задание:**
+## Prepare
 
-Написать часть сервиса аутентификации.
+Copy env variables from `.env.dist` to `.env` file:
 
-Два REST маршрута:
+```bash
+cp .env.dist .env
+```
 
-- Первый маршрут выдает пару Access, Refresh токенов для пользователя с идентификатором (GUID) указанным в параметре запроса
-- Второй маршрут выполняет Refresh операцию на пару Access, Refresh токенов
+Run MongoDB from Docker Compose file:
 
-**Требования:**
+```bash
+docker-compose up -d
+```
 
-Access токен тип JWT, алгоритм SHA512, хранить в базе строго запрещено.
+Install dependencies:
 
-Refresh токен тип произвольный, формат передачи base64, хранится в базе исключительно в виде bcrypt хеша, должен быть защищен от изменения на стороне клиента и попыток повторного использования.
+```bash
+make install
+```
 
-Access, Refresh токены обоюдно связаны, Refresh операцию для Access токена можно выполнить только тем Refresh токеном который был выдан вместе с ним.
+## Run
 
-**Результат:**
+Start server:
 
-Результат выполнения задания нужно предоставить в виде исходного кода на Github.
+```bash
+make run
+```

@@ -7,4 +7,6 @@ import (
 
 type Store interface {
 	SaveRefreshToken(ctx context.Context, refreshToken *models.RefreshToken) error
+	FindRefreshTokenById(ctx context.Context, id string) (*models.RefreshToken, error)
+	DeleteRefreshTokenById(ctx context.Context, id string) error
 }

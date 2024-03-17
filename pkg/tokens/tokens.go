@@ -46,3 +46,27 @@ func GenerateAccessTokenString(userId string, refreshTokenId string, lifetimeInM
 
 	return tokenString, nil
 }
+
+func DecodeJwtToken(tokenString string, secret string) (*jwt.Token, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+		// SigningMethodHMAC implements the HMAC-SHA and SigningMethodHS512 its specific instance
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.ErrSignatureInvalid
+		}
+
+		return []byte(secret), nil
+	})
+
+	if err != nil {
+		v, _ := err.(*jwt.ValidationError)
+
+		// ignore expiration when decoding
+		if v.Errors == jwt.ValidationErrorExpired {
+			return token, nil
+		}
+
+		return nil, err
+	}
+
+	return token, nil
+}
