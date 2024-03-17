@@ -19,9 +19,11 @@ type Config struct {
 
 var Envs = initEnvs()
 
+const envFileName = ".env"
+
 func initEnvs() *Config {
-	if err := dotEnv.Load(".env"); err != nil {
-		log.Fatalln("Error loading .ENV file")
+	if err := dotEnv.Load(envFileName); err != nil {
+		log.Fatalln("error loading env file")
 	}
 
 	config := &Config{
@@ -42,7 +44,7 @@ func getEnvString(key string) string {
 	value, ok := os.LookupEnv(key)
 
 	if !ok {
-		log.Fatalf("Env \"%s\" is not set\n", key)
+		log.Fatalf("env variable \"%s\" is not set\n", key)
 	}
 
 	return value
@@ -52,12 +54,12 @@ func getEnvInt(key string) int {
 	value, ok := os.LookupEnv(key)
 
 	if !ok {
-		log.Fatalf("Env \"%s\" is not set", key)
+		log.Fatalf("env variable \"%s\" is not set\n", key)
 	}
 
 	intValue, err := strconv.Atoi(value)
 	if err != nil {
-		log.Fatalf("Env \"%s\" is not integer", key)
+		log.Fatalf("env variable \"%s\" is not integer\n", key)
 	}
 
 	return intValue

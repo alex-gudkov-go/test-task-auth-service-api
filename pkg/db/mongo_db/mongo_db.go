@@ -3,14 +3,13 @@ package mongo_db
 import (
 	"context"
 	"log"
-	"test-task-auth-service-api/config"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func Init() *mongo.Database {
-	clientOptions := options.Client().ApplyURI(config.Envs.MongoUri)
+func Init(uri string, databaseName string) *mongo.Database {
+	clientOptions := options.Client().ApplyURI(uri)
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
@@ -21,5 +20,5 @@ func Init() *mongo.Database {
 		log.Fatal("Could not connect to the database:", err)
 	}
 
-	return client.Database(config.Envs.MongoDatabaseName)
+	return client.Database(databaseName)
 }

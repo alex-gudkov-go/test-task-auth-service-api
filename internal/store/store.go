@@ -2,7 +2,7 @@ package store
 
 import (
 	"context"
-	"test-task-auth-service-api/models"
+	"test-task-auth-service-api/internal/models"
 )
 
 type Store interface {

@@ -2,7 +2,7 @@ package mongo_store
 
 import (
 	"context"
-	"test-task-auth-service-api/models"
+	"test-task-auth-service-api/internal/models"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

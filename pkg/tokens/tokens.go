@@ -1,32 +1,15 @@
-package utils
+package tokens
 
 import (
 	"encoding/base64"
 	"math/rand"
 	"strconv"
-	"test-task-auth-service-api/config"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
-func HashRefreshTokenString(token string) (string, error) {
-	ht, err := bcrypt.GenerateFromPassword([]byte(token), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-
-	return string(ht), nil
-}
-
-func ValidateGuid(guid string) error {
-	// GUID is actually the same 128-bit identifier as UUID but in context of Windows OS
-	return uuid.Validate(guid)
-}
-
-func GenerateRandomString(size int) string {
+func generateRandomString(size int) string {
 	r := rand.New(rand.NewSource(time.Now().Unix()))
 	b := []byte("abcdefghijklmnopqrstuvwxyz" + "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "1234567890")
 	s := make([]byte, size)
@@ -39,7 +22,7 @@ func GenerateRandomString(size int) string {
 }
 
 func GenerateRefreshTokenString() (string, error) {
-	randomString := GenerateRandomString(16)
+	randomString := generateRandomString(16)
 	timeString := strconv.FormatInt(time.Now().Unix(), 10)
 
 	tokenString := randomString + timeString
@@ -48,15 +31,15 @@ func GenerateRefreshTokenString() (string, error) {
 	return tokenStringBase64, nil
 }
 
-func GenerateAccessTokenString(userId string, refreshTokenId string) (string, error) {
+func GenerateAccessTokenString(userId string, refreshTokenId string, lifetimeInMinutes int, secret string) (string, error) {
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims{
 		"userId":         userId,
 		"refreshTokenId": refreshTokenId,
 		"iat":            time.Now().Unix(),
-		"exp":            time.Now().Add(time.Minute * time.Duration(config.Envs.AccessTokenLifetimeInMinutes)).Unix(),
+		"exp":            time.Now().Add(time.Minute * time.Duration(lifetimeInMinutes)).Unix(),
 	})
 
-	tokenString, err := jwtToken.SignedString([]byte(config.Envs.AccessTokenSecret))
+	tokenString, err := jwtToken.SignedString([]byte(secret))
 	if err != nil {
 		return "", err
 	}

@@ -1,11 +1,14 @@
-package auth_service
+package auth
 
 import (
 	"net/http"
-	"test-task-auth-service-api/models"
-	"test-task-auth-service-api/response"
-	"test-task-auth-service-api/store"
-	"test-task-auth-service-api/utils"
+	"test-task-auth-service-api/internal/config"
+	"test-task-auth-service-api/internal/models"
+	"test-task-auth-service-api/internal/store"
+	"test-task-auth-service-api/pkg/hash"
+	"test-task-auth-service-api/pkg/response"
+	"test-task-auth-service-api/pkg/tokens"
+	"test-task-auth-service-api/pkg/validate"
 
 	"github.com/gorilla/mux"
 )
@@ -18,26 +21,26 @@ func New(store store.Store) *AuthService {
 	return &AuthService{store}
 }
 
-func (as *AuthService) RegisterRoutes(router *mux.Router) {
-	router.HandleFunc("/auth/{user_id}/tokens/sign", as.handleSignTokens).Methods(http.MethodPost)
+func (as *AuthService) RegisterHandlers(router *mux.Router) {
+	router.HandleFunc("/auth/{user_id}/tokens/sign", as.HandleSignTokens).Methods(http.MethodPost)
 }
 
-func (as *AuthService) handleSignTokens(rw http.ResponseWriter, req *http.Request) {
+func (as *AuthService) HandleSignTokens(rw http.ResponseWriter, req *http.Request) {
 	userId := mux.Vars(req)["user_id"]
-	if err := utils.ValidateGuid(userId); err != nil {
+	if err := validate.ValidateGuid(userId); err != nil {
 		response.Write(rw, response.Error{Message: "param \"user_id\" is not valid GUID"}, http.StatusBadRequest)
 		return
 	}
 
 	// generate refresh token
-	refreshTokenString, err := utils.GenerateRefreshTokenString()
+	refreshTokenString, err := tokens.GenerateRefreshTokenString()
 	if err != nil {
 		response.Write(rw, response.Error{Message: err.Error()}, http.StatusInternalServerError)
 		return
 	}
 
 	// hash refresh token before save
-	refreshTokenStringHash, err := utils.HashRefreshTokenString(refreshTokenString)
+	refreshTokenStringHash, err := hash.HashRefreshTokenString(refreshTokenString)
 	if err != nil {
 		response.Write(rw, response.Error{Message: err.Error()}, http.StatusInternalServerError)
 		return
@@ -54,7 +57,7 @@ func (as *AuthService) handleSignTokens(rw http.ResponseWriter, req *http.Reques
 	}
 
 	// generate access token (bind to refresh token ID)
-	accessTokenString, err := utils.GenerateAccessTokenString(userId, refreshToken.Id)
+	accessTokenString, err := tokens.GenerateAccessTokenString(userId, refreshToken.Id, config.Envs.AccessTokenLifetimeInMinutes, config.Envs.AccessTokenSecret)
 	if err != nil {
 		response.Write(rw, response.Error{Message: err.Error()}, http.StatusInternalServerError)
 		return
