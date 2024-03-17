@@ -8,7 +8,9 @@ import (
 )
 
 type Config struct {
-	MongoUri string
+	Address           string
+	MongoUri          string
+	MongoDatabaseName string
 }
 
 var Envs = initEnvs()
@@ -19,7 +21,9 @@ func initEnvs() *Config {
 	}
 
 	config := &Config{
-		MongoUri: getEnvString("MONGO_URI"),
+		Address:           getEnvString("ADDRESS"),
+		MongoUri:          getEnvString("MONGO_URI"),
+		MongoDatabaseName: getEnvString("MONGO_DATABASE_NAME"),
 	}
 
 	log.Printf("Config: %+v", config)

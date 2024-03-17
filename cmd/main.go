@@ -1,36 +1,15 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"log"
 	"test-task-auth-service-api/config"
-
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	mongoDb "test-task-auth-service-api/db/mongo_db"
+	"test-task-auth-service-api/server"
+	mongoStore "test-task-auth-service-api/store/mongo_store"
 )
 
 func main() {
-	// set client options
-	clientOptions := options.Client().ApplyURI(config.Envs.MongoUri)
-
-	// connect to MongoDB
-	client, err := mongo.Connect(context.Background(), clientOptions)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// check connection
-	err = client.Ping(context.Background(), nil)
-	if err != nil {
-		log.Fatal("Could not connect to the database:", err)
-	}
-	log.Println("Connected to MongoDB")
-
-	// disconnect from MongoDB
-	err = client.Disconnect(context.Background())
-	if err != nil {
-		log.Fatal("Error disconnecting from MongoDB:", err)
-	}
-	fmt.Println("Disconnected from MongoDB")
+	db := mongoDb.Init()
+	store := mongoStore.New(db)
+	server := server.New(config.Envs.Address, store)
+	server.Start()
 }
